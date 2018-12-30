@@ -52,4 +52,5 @@ print("%s incoming channels opened with %s total" % (num_incoming, incoming))
 print("Balance available outgoing: %s" % (outgoing_total_balance))
 print("Balance available incoming: %s" % (incoming_total_balance))
 
-
+paid = sum([p['msatoshi_sent']/1000.0 for p in ld.listpayments()['payments']]) / COIN
+print("Total sent inpayments: %s" % paid)
