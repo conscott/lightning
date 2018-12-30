@@ -14,6 +14,7 @@
 #include <channeld/gen_channel_wire.h>
 #include <common/dev_disconnect.h>
 #include <common/features.h>
+#include <common/htlc.h>
 #include <common/initial_commit_tx.h>
 #include <common/json_command.h>
 #include <common/jsonrpc_errors.h>
@@ -718,6 +719,8 @@ static void json_add_peer(struct lightningd *ld,
 			      &channel->funding_txid);
 		json_add_bool(response, "private",
 				!(channel->channel_flags & CHANNEL_FLAGS_ANNOUNCE_CHANNEL));
+		json_add_string(response, "funder",
+				side_to_str(channel->funder));
 		json_add_u64(response, "msatoshi_to_us",
 			     channel->our_msatoshi);
 		json_add_u64(response, "msatoshi_to_us_min",
