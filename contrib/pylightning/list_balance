@@ -10,7 +10,9 @@ def default_configdir():
         return os.path.join(home, ".lightning")
     return "."
 
+M = 10**3.0
 COIN = 10**8.0
+MCOIN = 10**11.0
 
 rpc_path = os.path.join(default_configdir(), "lightning-rpc")
 ld = LightningRpc(rpc_path)
@@ -38,7 +40,7 @@ incoming_total_balance = 0
 outgoing_total_balance = 0
 for p in peerinfo['peers']:
     for channel in p['channels']:
-        if 'owner' in channel:
+        if channel['funder'] == 'LOCAL':
             outgoing += channel['msatoshi_total']
             num_outgoing += 1
         else:
@@ -47,10 +49,22 @@ for p in peerinfo['peers']:
         incoming_total_balance += (channel['msatoshi_total'] - channel['msatoshi_to_us'])
         outgoing_total_balance += channel['msatoshi_to_us']
 
-print("%s outgoing channels opened with %s total" % (num_outgoing, outgoing))
-print("%s incoming channels opened with %s total" % (num_incoming, incoming))
-print("Balance available outgoing: %s" % (outgoing_total_balance))
-print("Balance available incoming: %s" % (incoming_total_balance))
+print("%s outgoing channels opened with %s total" % (num_outgoing, outgoing / MCOIN))
+print("%s incoming channels opened with %s total" % (num_incoming, incoming / MCOIN))
+print("Balance available outgoing: %s" % (outgoing_total_balance / MCOIN))
+print("Balance available incoming: %s" % (incoming_total_balance / MCOIN))
 
-paid = sum([p['msatoshi_sent']/1000.0 for p in ld.listpayments()['payments']]) / COIN
-print("Total sent inpayments: %s" % paid)
+payments = ld.listpayments()
+paid = sum([p['msatoshi'] for p in payments['payments'] if p['status'] == 'complete']) / MCOIN
+paid_w_fees = sum([p['msatoshi_sent'] for p in payments['payments'] if p['status'] == 'complete']) / MCOIN
+fees = sum([(p['msatoshi_sent'] - p['msatoshi']) for p in payments['payments'] if p['status'] == 'complete']) / MCOIN
+
+print("Total paid invoices : %s" % paid)
+print("Total paid in routing fees : %s" % fees)
+print("Total paid including routing fees: %s" % paid_w_fees)
+
+invoices  = ld.listinvoices()
+
+received = sum([i['msatoshi_received'] for i in invoices['invoices'] if i['status'] == 'paid']) / MCOIN
+
+print("Total received in payments: %s" % received)
