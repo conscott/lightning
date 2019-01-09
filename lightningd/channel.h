@@ -58,6 +58,7 @@ struct channel {
 
 	/* Funding txid and amounts */
 	struct bitcoin_txid funding_txid;
+	u32 funding_depth;
 	u16 funding_outnum;
 	u64 funding_satoshi, push_msat;
 	bool remote_funding_locked;

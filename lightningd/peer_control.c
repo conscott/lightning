@@ -528,6 +528,7 @@ static enum watch_result funding_lockin_cb(struct lightningd *ld,
 	tal_free(txidstr);
 
 	if (depth < channel->minimum_depth)
+		channel->funding_depth = depth;
 		return KEEP_WATCHING;
 
 	/* If we restart, we could already have peer->scid from database */

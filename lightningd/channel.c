@@ -209,6 +209,7 @@ struct channel *new_channel(struct peer *peer, u64 dbid,
 	channel->next_index[REMOTE] = next_index_remote;
 	channel->next_htlc_id = next_htlc_id;
 	channel->funding_txid = *funding_txid;
+	channel->funding_depth = 0;
 	channel->funding_outnum = funding_outnum;
 	channel->funding_satoshi = funding_satoshi;
 	channel->push_msat = push_msat;

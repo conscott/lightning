@@ -425,8 +425,13 @@ static struct command_result *json_listfunds(struct command *cmd,
 		}
 		if (utxos[i]->spendheight)
 			json_add_string(response, "status", "spent");
-		else if (utxos[i]->blockheight)
+		else if (utxos[i]->blockheight) {
 			json_add_string(response, "status", "confirmed");
+            json_add_num(response, "blockheight", *utxos[i]->blockheight);
+            json_add_num(response, "current_blockheight", get_block_height(cmd->ld->topology));
+            u32 confirmations = get_block_height(cmd->ld->topology) - *utxos[i]->blockheight + 1;
+            json_add_num(response, "confirmations", confirmations);
+        }
 		else
 			json_add_string(response, "status", "unconfirmed");
 
@@ -453,6 +458,10 @@ static struct command_result *json_listfunds(struct command *cmd,
 				     c->funding_satoshi);
 			json_add_txid(response, "funding_txid",
 				      &c->funding_txid);
+			json_add_num(response, "confirmations",
+				      c->funding_depth);
+            json_add_num(response, "required_confirmations",
+                      c->minimum_depth);
 			json_object_end(response);
 		}
 	}
