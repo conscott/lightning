@@ -190,7 +190,11 @@ class Plugin(object):
                 ),
             }
             self.log(traceback.format_exc())
-        json.dump(result, fp=self.stdout)
+
+        # Reformat intenting level to match what lightningd will print
+        to_print = '\n'.join([v if idx == 0 or v == '}' else v[2:]
+                             for idx, v in enumerate(json.dumps(result, indent=2).split('\n'))])
+        self.stdout.write(to_print)
         self.stdout.write('\n\n')
         self.stdout.flush()
 
